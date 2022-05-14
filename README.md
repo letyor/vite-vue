@@ -2,11 +2,12 @@
 
 做一个前端项目目录结构设计，注重的是一个结构的设计。在开发的过程中，经常会遇到把什么内容，放在哪个目录下？如何去抽象一个业务，它们之间如何去通讯？觉得这个事情是蛮有趣的，就把它记录下来了。
 
+> 整个过程，并没有原创，标新立异，很多已经是行业的惯例了，更多的是对职责划分的，结构设计的思考过程。
+
 ## 项目特点
 
 - 突出特点：注重的是项目的结构设计过程，为什么这样做
 - 雏形：这一个项目，不聚焦功能的集成，每个项目需求千差万别，取舍到到什么程度，因项目而异。
-
 
 ## 原则 
 
@@ -25,6 +26,7 @@
 - hooks 公用业务逻辑
 - store 存储
 - utils 工具
+  
 
 ### api 接口
 
@@ -32,7 +34,7 @@
 
 - 定义：对外界发起请求，如: fetch, ajax 的请求
 - 边界：侧重的是请求，如：get, post 发起一个接口请求，像触发请求的动作，获取数据后的处理不可归到本目录中
-
+- 命名：如果叫services，这个职责是比较大，是对pages的页面的具体实现切分才可以，感觉不大合适，当然你这样命名也没有绝对的错对之分。
 ### 应用说明
 
 边界是定义的再清晰的，也会遇到模糊的时候，需要面对取舍，达到竞争平衡。
@@ -115,41 +117,50 @@ export const getRoleByUser = async (params: any) => {
 - 控制页面的访问权限
 ### hooks 
 
+页面级的业务逻辑共享，这个也是借鉴后端的service架构设计，有如下的特点：
 
-页面级的业务逻辑共享
+- 与视图无关，是纯数据的逻辑利用
+- 被多个页面共用
 
-### store [存储](https://pinia.vuejs.org/) 
+### store 
+页面数据的共享，与hooks的区别是，这个是数据层面的共享，并且要么在整个应用的生命周期中是不变的，要么是跨页面的通讯
+
+- [存储](https://pinia.vuejs.org/) ：登录信息，权限的共享
 ### utils 工具
 
+这个是第三方库的集成，进行二次封装，初始化配置。或者是自定义的一些辅助函数，业务的公用函数。
 
+当时有设想过按第三方划分：vendor存放第三方，custom 存放自定义。这样的分类方式，并不是没有接近业务，架构的本质。对于来源什么地方？重要吗? 而是提供什么功能价值，才是用户关心的。也就是实体， 一个一个具体的主题：
 
+- axios：处理http请求
+- dayjs：处理日期
+- swiper: 处理滑动
 
-## npm 第三方库
+### 实体分析
+
+实体就是对一个项目组成进行拆分成要素，一个一个职责明确的主体。如一个电商平台：可以分为买家，卖家，物流，也可以分类商品订单，物流订单，支付。
+
+实体的拆分，体现的是设计者对整个事物的庖丁解牛。架构通讯体现的是实体之间的关联，是一种表达，如同个体与个体之间沟通的手势一样，语言一样。
+
+- 有哪些实体：要如何划分呢
+  - 角色扮演：买家，卖家
+  - 功能服务：订单，物流单，支付
+  
+- 实体的关系：
+  - 从属关系：如订单中的商品，那么关系构建在订单上，主动发生关联的上面
+  - 先后关系：订单 -> 支付 -> 发货，应该记录在起点，也就是订单上
+
+## 集成
 
 在项目中使用第三方库作为一些场景的解决方案，如：router, axios
 
-- UI 组件库: [Ant Design](https://ant.design/index-cn)
-- 路由: [React Router](https://reactrouter.com/)
-- 状态: [redux]https://redux.js.org/
-- css类: [classnames](https://www.npmjs.com/package/classnames)
-- style: 样式使用 [styled-components](https://styled-components.com/)
+- UI 组件库: [Naive UI](https://www.naiveui.com/zh-CN/os-theme)
+- 路由: [vue router](https://router.vuejs.org/)
+- 状态: [pinia](https://pinia.vuejs.org/)
 - http 库: [axios](https://github.com/axios/axios)
 
 > 样式的解决方案，推荐css-in-js, 完全组件化
 
-
-
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
-
-## Recommended IDE Setup
+## 推荐 IDE 设置
 
 - [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
-
-## Type Support For `.vue` Imports in TS
-
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can enable Volar's Take Over mode by following these steps:
-
-1. Run `Extensions: Show Built-in Extensions` from VS Code's command palette, look for `TypeScript and JavaScript Language Features`, then right click and select `Disable (Workspace)`. By default, Take Over mode will enable itself if the default TypeScript extension is disabled.
-2. Reload the VS Code window by running `Developer: Reload Window` from the command palette.
-
-You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/volar/discussions/471).
